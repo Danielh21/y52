@@ -25,6 +25,7 @@ public class RandomPlayer implements BattleshipsPlayer
    
     public RandomPlayer()
     {
+        //hello
     }
 
    
