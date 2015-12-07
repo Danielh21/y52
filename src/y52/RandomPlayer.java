@@ -151,6 +151,10 @@ public class RandomPlayer implements BattleshipsPlayer
     public void startRound(int round)
     {
         //Do nothing
+        ArrayList<Coordinates> shootsAt = new ArrayList<>();
+        setAllXY(shootsAt);
+        
+        
     }
 
     
@@ -183,5 +187,17 @@ public class RandomPlayer implements BattleshipsPlayer
     public void endMatch(int won, int lost, int draw)
     {
         //Do nothing
+    }
+
+    public void setAllXY(ArrayList<Coordinates> Contains) {
+        for (int i = 0; i < 10; i++) {
+            
+            for (int j = 0; j < 10; j++) {
+                Coordinates xy = new Coordinates(i, j, 100);
+                Contains.add(xy);
+                
+            }
+            
+        }
     }
 }
