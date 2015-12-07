@@ -22,6 +22,7 @@ public class RP implements BattleshipsPlayer
     private int sizeX;
     private int sizeY;
     private Board myBoard;
+    ArrayList<Coordinates> shootsAt = new ArrayList<>();
    
     public RP()
     {
@@ -102,9 +103,15 @@ public class RP implements BattleshipsPlayer
     @Override
     public Position getFireCoordinates(Fleet enemyShips)
     {
-        int x = rnd.nextInt(sizeX);
-        int y = rnd.nextInt(sizeY); // make sure to not hit the same place twice.
+        int randomShoot = rnd.nextInt(shootsAt.size());
+        
+        int x = shootsAt.get(randomShoot).x;
+        int y = shootsAt.get(randomShoot).y;
+        
+        shootsAt.remove(randomShoot);
+                                                                  
         return new Position(x,y);
+        
         
 //        for (Ship ship : enemyShips) {
 //            ship.size();
@@ -151,7 +158,6 @@ public class RP implements BattleshipsPlayer
     public void startRound(int round)
     {
         //Do nothing
-        ArrayList<Coordinates> shootsAt = new ArrayList<>();
         setAllXY(shootsAt);
         
         
