@@ -55,25 +55,19 @@ public class RP implements BattleshipsPlayer
         myBoard = board; 
         sizeX = board.sizeX();
         sizeY = board.sizeY();
-        for(int i = 0; i < fleet.getNumberOfShips(); ++i)
-        {
-            Ship s = fleet.getShip(i);
-            boolean vertical = rnd.nextBoolean();
-            Position pos;
-            if(vertical)
-            {
-                int x = rnd.nextInt(sizeX);
-                int y = rnd.nextInt(sizeY-(s.size()-1));
-                pos = new Position(x, y);
-            }
-            else
-            {
-                int x = rnd.nextInt(sizeX-(s.size()-1));
-                int y = rnd.nextInt(sizeY);
-                pos = new Position(x, y);
-            }
-            board.placeShip(pos, s, vertical);
-        }
+        
+        Ship ship2= fleet.getShip(0); //length 2
+        Ship ship301= fleet.getShip(1); //length 3
+        Ship ship302= fleet.getShip(2); //length 3
+        Ship ship4= fleet.getShip(3); //length 4
+        Ship ship5= fleet.getShip(4); //length 5
+        
+        board.placeShip(new Position(9,8), ship2, true);
+        board.placeShip(new Position(1,0), ship301, true);
+        board.placeShip(new Position(2,0), ship302, true);
+        board.placeShip(new Position(3,0), ship4, true);
+        board.placeShip(new Position(4,0), ship5, true);
+        
     }
 
     /**

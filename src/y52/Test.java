@@ -6,7 +6,7 @@
 package y52;
 
 import java.util.ArrayList;
-import battleship.interfaces.Position;
+import battleship.interfaces.Board;
 /**
  *
  * @author Daniel
@@ -24,6 +24,7 @@ public class Test {
         }
         
         
+                
     }
     
 }
