@@ -14,7 +14,7 @@ import battleship.interfaces.Position;
 public class Test {
     
     public static void main(String[] args) {
-        RandomPlayer rP = new RandomPlayer();
+        RP rP = new RP();
         
         ArrayList<Coordinates> Contains = new ArrayList<>();
         rP.setAllXY(Contains);

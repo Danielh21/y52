@@ -22,7 +22,7 @@ public class Y52 implements PlayerFactory<BattleshipsPlayer>
     @Override
     public BattleshipsPlayer getNewInstance()
     {
-        return new RandomPlayer();
+        return new RP();
     }
 
     @Override
