@@ -28,6 +28,11 @@ public class RP implements BattleshipsPlayer
     private PriorityQueue<Coordinates> priorities;
     private Coordinates shot;
     public Coordinates[][] board = new Coordinates[10][10];
+    boolean hasShip = true;
+    ArrayList<Coordinates> shootsAt = new ArrayList<>();
+    ArrayList<Coordinates> shipsPos = new ArrayList<>();
+    int randomPosX;
+    int randomPosY;
     
    
     public RP()
@@ -52,7 +57,7 @@ public class RP implements BattleshipsPlayer
      * @param fleet Fleet all the ships that a player should place. 
      * @param board Board the board were the ships must be placed.
      */
-    @Override
+   @Override
     public void placeShips(Fleet fleet, Board board)
     {
         
@@ -61,18 +66,22 @@ public class RP implements BattleshipsPlayer
         myBoard = board; 
         sizeX = board.sizeX();
         sizeY = board.sizeY();
+
+        for (int i = 0; i < fleet.getNumberOfShips()-1; i++) {
+            randomPosX = rnd.nextInt(sizeX);
+            randomPosY = rnd.nextInt(sizeY);
         
-        Ship ship2= fleet.getShip(0); //length 2
-        Ship ship301= fleet.getShip(1); //length 3
-        Ship ship302= fleet.getShip(2); //length 3
-        Ship ship4= fleet.getShip(3); //length 4
-        Ship ship5= fleet.getShip(4); //length 5
-        
-        board.placeShip(new Position(9,8), ship2, true);
-        board.placeShip(new Position(1,0), ship301, true);
-        board.placeShip(new Position(2,0), ship302, true);
-        board.placeShip(new Position(3,0), ship4, true);
-        board.placeShip(new Position(4,0), ship5, true);
+            System.out.println(randomPosX + "," + randomPosY);
+            
+            if(randomPosX + fleet.getShip(i).size() < sizeX-1 && hasShip == false){
+               board.placeShip(new Position(randomPosX, randomPosY), fleet.getShip(i), false);
+               
+            }else if(randomPosY + fleet.getShip(i).size() < sizeY-1 && hasShip == false) {
+               board.placeShip(new Position(randomPosX, randomPosY), fleet.getShip(i), true);
+            }else{
+               i--;
+            }  
+        }
         
     }
 
