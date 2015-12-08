@@ -5,6 +5,8 @@
  */
 package y52;
 
+import java.util.Random;
+
 /**
  *
  * @author Daniel
@@ -13,12 +15,35 @@ class Coordinates {
     
     public final int x;
     public final int y;
-    public final int pre;
-
+    public int pre;
+    Random gen = new Random();
+            
     public Coordinates(int x, int y, int pre) {
         this.x = x;
         this.y = y;
         this.pre = pre;
+    }
+
+    public Coordinates() {
+        x = gen.nextInt(10);
+        y = gen.nextInt(10);
+        pre=1;
+    }
+
+    public void setPre(int pre) {
+        this.pre = pre;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getPre() {
+        return pre;
     }
     
 }

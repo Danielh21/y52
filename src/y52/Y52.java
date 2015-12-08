@@ -28,7 +28,7 @@ public class Y52 implements PlayerFactory<BattleshipsPlayer>
     @Override
     public String getID()
     {
-        return "E1";
+        return "Y52";
     }
 
     @Override

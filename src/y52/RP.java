@@ -11,6 +11,8 @@ import battleship.interfaces.Board;
 import battleship.interfaces.Ship;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 /**
  *
@@ -22,11 +24,15 @@ public class RP implements BattleshipsPlayer
     private int sizeX;
     private int sizeY;
     private Board myBoard;
-    ArrayList<Coordinates> shootsAt = new ArrayList<>();
+    private int shipsBeforeShot;
+    private PriorityQueue<Coordinates> priorities;
+    private Coordinates shot;
+    public Coordinates[][] board = new Coordinates[10][10];
+    
    
     public RP()
     {
-        //hello
+        //hello 
     }
 
    
@@ -97,21 +103,43 @@ public class RP implements BattleshipsPlayer
     @Override
     public Position getFireCoordinates(Fleet enemyShips)
     {
-        int randomShoot = rnd.nextInt(shootsAt.size());
+        for (Coordinates c : priorities) {
+            System.out.println("Priorites:" + c.x + "," + c.y);
+        }
+        if(!priorities.isEmpty()){                                  //Will take the top from the priorities que.                    
+            shot =priorities.poll();                                // And removes it. 
+            int x = shot.x;
+            int y = shot.y;
+            System.out.println("Shoots at: " + x + "," + y);
+            return new Position(x, y);
+        }
+        else{                                               // Will only excicure if their is nothing in the prioviteque.
+        int randomX = rnd.nextInt(board.length);          // Finds a random number for the size of the array.
+        int randomY = rnd.nextInt(board[1].length);
+        shot = board[randomX][randomY];                      // Creates an instance.
+        if(shot.getPre()==0){
+            randomX = rnd.nextInt(board.length);
+            randomY = rnd.nextInt(board[1].length);
+            shot = board[randomX][randomY];
+        }
+         
+                  for (Coordinates board[] : board) {               //runs through the array to check if if something has
+                        for (Coordinates coor : board) {            // an higher %
+                          if(coor.pre > shot.getPre()){
+                              shot = coor;
+                          }
+                      }
+            }
+
         
-        int x = shootsAt.get(randomShoot).x;
-        int y = shootsAt.get(randomShoot).y;
-        
-        shootsAt.remove(randomShoot);
+       int x = shot.x;
+       int y = shot.y;
+        System.out.println("Shoots Random at: " + x + "," + y);
+        board[x][y].setPre(0);                             //sets the % to 0, because it's about to fire at the coordinat
                                                                   
         return new Position(x,y);
-        
-        
-//        for (Ship ship : enemyShips) {
-//            ship.size();
-//            //....
-//        }
-        // You need to create an method 
+        }
+       
     }
 
     
@@ -128,7 +156,21 @@ public class RP implements BattleshipsPlayer
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips)
     {
-        //Do nothing
+        
+        if(hit){
+            System.out.println("We have a hit");
+        
+        if(shipsBeforeShot > enemyShips.getNumberOfShips()){ // Means that we hit and Wrecked 
+           shipsBeforeShot= enemyShips.getNumberOfShips();
+            
+        }
+        else{ // Means that we hit and did not Wreck
+        prioritiseNabors(shot);
+            
+        }
+        
+        }
+        
     }    
 
     
@@ -141,6 +183,20 @@ public class RP implements BattleshipsPlayer
     public void startMatch(int rounds)
     {
         //Do nothing
+        Comparator<Coordinates> comparator = new Comparator<Coordinates>() {
+
+            @Override
+            public int compare(Coordinates o1, Coordinates o2) {
+                if(o1.getPre() > o2.getPre()){
+                    return 1;
+                }
+                else if (o1.getPre() < o2.getPre()){
+                    return -1;
+                }
+                return 0;
+            }
+        };
+        priorities = new PriorityQueue<>(100,comparator);
     }
     
     
@@ -151,10 +207,10 @@ public class RP implements BattleshipsPlayer
     @Override
     public void startRound(int round)
     {
-        //Do nothing
-        setAllXY(shootsAt);
-        
-        
+        setBoard(board);
+        shipsBeforeShot =5;
+        priorities.clear();
+        board[9][9].setPre(9);
     }
 
     
@@ -189,15 +245,60 @@ public class RP implements BattleshipsPlayer
         //Do nothing
     }
 
-    public void setAllXY(ArrayList<Coordinates> Contains) {
-        for (int i = 0; i < 10; i++) {
-            
-            for (int j = 0; j < 10; j++) {
-                Coordinates xy = new Coordinates(i, j, 100);
-                Contains.add(xy);
-                
+
+
+    private void prioritiseNabors(Coordinates shot) {
+        
+        /*Easelier seen when drawing the board!
+        left nabour = board[shot.x-1][shot.y]
+        right nabour = board[shot.x+1][shot.y]
+        under nabour = board[shot.x][shot.y-1]   
+        above nabour = board[shot.x][shot.y+1]
+        */
+        
+    
+        if(board[shot.x-1][shot.y]!= null && board[shot.x-1][shot.y].getPre()!=0){
+            priorities.add(board[shot.x-1][shot.y]);
+            board[shot.x-1][shot.y].setPre(0);
+        }
+        
+         if(board[shot.x+1][shot.y] != null && board[shot.x+1][shot.y].getPre()!=0){
+            priorities.add(board[shot.x+1][shot.y]);
+            board[shot.x+1][shot.y].setPre(0);
+        }
+         
+          if(board[shot.x][shot.y-1] != null && board[shot.x][shot.y-1].getPre()!=0){
+            priorities.add(board[shot.x][shot.y-1]);
+            board[shot.x][shot.y-1].setPre(0);
+        }
+          
+           if(board[shot.x][shot.y+1] != null && board[shot.x][shot.y+1].getPre()!=0){
+            priorities.add(board[shot.x][shot.y+1]);
+            board[shot.x][shot.y+1].setPre(0);
+        }
+    }
+    
+     public void setBoard(Coordinates[][] array) {
+
+        for (int i = 0; i < array.length; i++) {
+
+            for (int j = 0; j < array[i].length; j++) {
+                 array[i][j] = new Coordinates(i, j, 1);
             }
             
         }
+        
     }
+     
+     public void setGritShots(Coordinates[][] array){
+         for (int i = 0; i < array.length; i++) {
+
+            for (int j = 0; j < array[i].length; j++) {
+                 if(i%2==0 && j%2!=0){
+                     array[i][j].setPre(2);
+                 }
+            }
+            
+        }
+     }
 }
