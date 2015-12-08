@@ -67,16 +67,14 @@ public class RP implements BattleshipsPlayer
         sizeX = board.sizeX();
         sizeY = board.sizeY();
 
-        for (int i = 0; i < fleet.getNumberOfShips()-1; i++) {
+        for (int i = 0; i < fleet.getNumberOfShips(); i++) {
             randomPosX = rnd.nextInt(sizeX);
             randomPosY = rnd.nextInt(sizeY);
         
-            System.out.println(randomPosX + "," + randomPosY);
-            
-            if(randomPosX + fleet.getShip(i).size() < sizeX-1 && hasShip == false){
+            if(randomPosX + fleet.getShip(i).size() < sizeX-1){
                board.placeShip(new Position(randomPosX, randomPosY), fleet.getShip(i), false);
                
-            }else if(randomPosY + fleet.getShip(i).size() < sizeY-1 && hasShip == false) {
+            }else if(randomPosY + fleet.getShip(i).size() < sizeY-1) {
                board.placeShip(new Position(randomPosX, randomPosY), fleet.getShip(i), true);
             }else{
                i--;
