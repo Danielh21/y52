@@ -12,7 +12,6 @@ import battleship.interfaces.Position;
 import battleship.interfaces.Ship;
 import battleship.implementations.*;
 import java.util.Iterator;
-import jdk.nashorn.internal.runtime.arrays.IteratorAction;
 /**
  *
  * @author Daniel
@@ -23,13 +22,13 @@ public class Test {
         RP rP = new RP();
         Coordinates[][] board = new Coordinates[10][10];
         Fleet fleet = FleetIni();
-//        rP.startMatch(1);
-//        rP.startRound(1);
-//        for (int i = 0; i < 100; i++) {
-//            Position n = rP.getFireCoordinates(fleet);
-//            System.out.println("X: " + n.x + " Y: " + n.y);
-//            
-//        }
+////        rP.startMatch(1);
+////        rP.startRound(1);
+////        for (int i = 0; i < 100; i++) {
+////            Position n = rP.getFireCoordinates(fleet);
+////            System.out.println("X: " + n.x + " Y: " + n.y);
+////            
+////        }
         rP.setBoard(board);
         String returnStatement = "";
 
@@ -43,8 +42,18 @@ public class Test {
         }
         
         System.out.println(returnStatement);
+        
 }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
     public static Fleet FleetIni() {
         Fleet fleet = new Fleet() {
             
