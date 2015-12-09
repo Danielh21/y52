@@ -21,20 +21,15 @@ import java.util.PriorityQueue;
 public class RP implements BattleshipsPlayer {
 
     private final static Random rnd = new Random();
-    private int sizeX;
-    private int sizeY;
-    private Board myBoard;
     private int shipsBeforeShot;
     private PriorityQueue<Coordinates> priorities;
     private Coordinates shot;
     public static Coordinates[][] board = new Coordinates[10][10];
-    boolean hasShip = true;
     ArrayList<Coordinates> shootsAt = new ArrayList<>();
-    ArrayList<Coordinates> shipsPos = new ArrayList<>();
-    int randomPosX;
-    int randomPosY;
     private int checkShips = 1;
     public static int[][] boardIntArray;
+    private int x;
+    private int y;
 
     public RP() {
         //hello 
@@ -68,11 +63,11 @@ public class RP implements BattleshipsPlayer {
         Ship ship4 = fleet.getShip(3); //length 4
         Ship ship5 = fleet.getShip(4); //length 5
 
-        findRandomPlace(ship2, board);
-        findRandomPlace(ship301, board);
-        findRandomPlace(ship302, board);
-        findRandomPlace(ship4, board);
-        findRandomPlace(ship5, board);
+        findRandomPlace(ship2, board, "s1");
+        findRandomPlace(ship301, board, "s2");
+        findRandomPlace(ship302, board, "s3");
+        findRandomPlace(ship4, board, "s4");
+        findRandomPlace(ship5, board,"s5");
     }
 
     /**
@@ -234,19 +229,42 @@ public class RP implements BattleshipsPlayer {
         //Do nothing
     }
 
-    public void findRandomPlace(Ship ship, Board board) {
+    public void findRandomPlace(Ship ship, Board board, String sNum) {
 
         Random gen = new Random();
 
         boolean horrOrVert = gen.nextBoolean(); //  True = Vertical (Increasing Y),  False Horrisontal(Increasing X)
 
-        int x = gen.nextInt(10);
-        int y = gen.nextInt(10);
+        switch(sNum){
+            case "s1":
+                this.x = rnd.nextInt(3)+7;
+                this.y = rnd.nextInt(5);
+                break;
+            case "s2":
+                this.x = rnd.nextInt(3);
+                this.y = rnd.nextInt(5)+5;
+                break;
+            case "s3":
+                this.x = rnd.nextInt(3);
+                this.y = rnd.nextInt(5);
+                break;
+            case "s4":
+                this.x = rnd.nextInt(3)+7;
+                this.y = rnd.nextInt(5)+5;
+                break;
+            case "s5":
+                this.x = rnd.nextInt(4)+3;
+                this.y = rnd.nextInt(10);
+                break;
+            default:
+                System.out.println("Switch Case is not working!");
+                break;
+        }
 
         boolean placeable = checkKooridnat(x, y, horrOrVert, ship.size());
 
         if (!placeable) {
-            findRandomPlace(ship, board);
+            findRandomPlace(ship, board, sNum);
 
         } else {
             if (horrOrVert) { // Place it Vertical (Increase Y)
