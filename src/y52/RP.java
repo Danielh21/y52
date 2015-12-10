@@ -23,13 +23,15 @@ public class RP implements BattleshipsPlayer {
     private final static Random rnd = new Random();
     private int shipsBeforeShot;
     private PriorityQueue<Coordinates> priorities;
+    private PriorityQueue<Coordinates> heapMap;
+    ArrayList<Coordinates> listOfGrits;
     private Coordinates shot;
-    public static Coordinates[][] board = new Coordinates[10][10];
-    ArrayList<Coordinates> shootsAt = new ArrayList<>();
+    public static Coordinates[][] board;
     private int checkShips = 1;
     public static int[][] boardIntArray;
     private int x;
     private int y;
+    private int startShot = 0;
 
     public RP() {
         //hello 
@@ -67,7 +69,7 @@ public class RP implements BattleshipsPlayer {
         findRandomPlace(ship301, board, "s2");
         findRandomPlace(ship302, board, "s3");
         findRandomPlace(ship4, board, "s4");
-        findRandomPlace(ship5, board,"s5");
+        findRandomPlace(ship5, board, "s5");
     }
 
     /**
@@ -102,34 +104,24 @@ public class RP implements BattleshipsPlayer {
             shot = priorities.poll();                                // And removes it. 
             int x = shot.x;
             int y = shot.y;
-            System.out.println("Shoots at: " + x + "," + y);
+            board[x][y].setPre(0);
+            System.out.println("Shoots nabours at: " + x + "," + y);
             return new Position(x, y);
         } else {                                               // Will only excicure if their is nothing in the prioviteque.
-            int randomX = rnd.nextInt(board.length);          // Finds a random number for the size of the array.
-            int randomY = rnd.nextInt(board[1].length);
-            shot = board[randomX][randomY];                      // Creates an instance.
-            if (shot.getPre() == 0) {
-                randomX = rnd.nextInt(board.length);
-                randomY = rnd.nextInt(board[1].length);
-                shot = board[randomX][randomY];
+            int randomAtGit = rnd.nextInt(listOfGrits.size());
+            shot = listOfGrits.get(randomAtGit);
+            while (board[shot.x][shot.y].getPre() == 0) {                              // Makes sure that we don't shoot at something that is zero.
+                listOfGrits.remove(randomAtGit);
+                randomAtGit = rnd.nextInt(listOfGrits.size());
+                shot = listOfGrits.get(randomAtGit);
             }
-
-            for (Coordinates board[] : board) {               //runs through the array to check if if something has
-                for (Coordinates coor : board) {            // an higher %
-                    if (coor.pre > shot.getPre()) {
-                        shot = coor;
-                    }
-                }
-            }
-
+            listOfGrits.remove(randomAtGit);
             int x = shot.x;
             int y = shot.y;
-            System.out.println("Shoots Random at: " + x + "," + y);
-            board[x][y].setPre(0);                             //sets the % to 0, because it's about to fire at the coordinat
-
+            board[x][y].setPre(0);
+            System.out.println("Shoots from grit at: " + x + "," + y);
             return new Position(x, y);
         }
-
     }
 
     /**
@@ -175,19 +167,9 @@ public class RP implements BattleshipsPlayer {
     @Override
     public void startMatch(int rounds) {
         //Do nothing
-        Comparator<Coordinates> comparator = new Comparator<Coordinates>() {
-
-            @Override
-            public int compare(Coordinates o1, Coordinates o2) {
-                if (o1.getPre() > o2.getPre()) {
-                    return 1;
-                } else if (o1.getPre() < o2.getPre()) {
-                    return -1;
-                }
-                return 0;
-            }
-        };
+        Comparator<Coordinates> comparator = new ComparatorCoordinates();
         priorities = new PriorityQueue<>(100, comparator);
+        heapMap = new PriorityQueue<>(100, comparator);
     }
 
     /**
@@ -197,8 +179,10 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public void startRound(int round) {
-        setBoard(board);
+        board = new Coordinates[10][10];
         priorities.clear();
+        setBoard(board);
+        setGritShots(board);
     }
 
     /**
@@ -235,25 +219,25 @@ public class RP implements BattleshipsPlayer {
 
         boolean horrOrVert = gen.nextBoolean(); //  True = Vertical (Increasing Y),  False Horrisontal(Increasing X)
 
-        switch(sNum){
+        switch (sNum) {
             case "s1":
-                this.x = rnd.nextInt(3)+7;
+                this.x = rnd.nextInt(3) + 7;
                 this.y = rnd.nextInt(5);
                 break;
             case "s2":
                 this.x = rnd.nextInt(3);
-                this.y = rnd.nextInt(5)+5;
+                this.y = rnd.nextInt(5) + 5;
                 break;
             case "s3":
                 this.x = rnd.nextInt(3);
                 this.y = rnd.nextInt(5);
                 break;
             case "s4":
-                this.x = rnd.nextInt(3)+7;
-                this.y = rnd.nextInt(5)+5;
+                this.x = rnd.nextInt(3) + 7;
+                this.y = rnd.nextInt(5) + 5;
                 break;
             case "s5":
-                this.x = rnd.nextInt(4)+3;
+                this.x = rnd.nextInt(4) + 3;
                 this.y = rnd.nextInt(10);
                 break;
             default:
@@ -349,14 +333,55 @@ public class RP implements BattleshipsPlayer {
     }
 
     public void setGritShots(Coordinates[][] array) {
+        listOfGrits = new ArrayList<>();
         for (int i = 0; i < array.length; i++) {
 
             for (int j = 0; j < array[i].length; j++) {
-                if (i % 2 == 0 && j % 2 != 0) {
-                    array[i][j].setPre(2);
+                if (i % 2 == 0 && j % 2 == 1) {
+                    listOfGrits.add(board[i][j]);
+                    listOfGrits.add(board[i + 1][j - 1]);
                 }
             }
-
+        }        //Print out test
+        for (Coordinates coor : listOfGrits) {
+            System.out.println(coor.x + "," + coor.y);
         }
+        System.out.println(listOfGrits.size());
+
+
+    }
+    /*
+     Should be called after every shot
+     */
+
+    public void updateGritMap() {
+        heapMap.clear();
+        for (Coordinates coor : listOfGrits) {
+            if (board[coor.x][coor.y].getPre() != 0) {
+
+                heapMap.add(board[coor.x][coor.y]);
+            }
+        }
+
+//        Test to Print out the map.
+        for (Coordinates coor : heapMap) {
+            System.out.println(coor.x + "," + coor.y + "  PRE: " + coor.getPre());
+        }
+        Coordinates d = heapMap.poll();
+        System.out.println(d.x + "," + d.y);
+        d = heapMap.poll();
+        System.out.println(d.x + "," + d.y);
+    }
+    /*
+     Just a Testmethod
+     */
+    public void editMap(){
+        board[1][4].setPre(0);
+        board[5][2].setPre(0);
+        board[8][5].setPre(98);
+        board[8][7].setPre(95);
+        board[4][5].setPre(92);
+        board[5][4].setPre(94);
+        board[7][0].setPre(100);
     }
 }
