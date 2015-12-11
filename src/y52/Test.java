@@ -30,6 +30,7 @@ public class Test {
 //            
 //        }
         rP.setBoard(board);
+        rP.getFireCoordinates(fleet);
 //        rP.editMap();
 //        rP.updateGritMap();
 //        String returnStatement = "";

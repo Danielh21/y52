@@ -12,7 +12,6 @@ import battleship.interfaces.Ship;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Comparator;
-import java.util.PriorityQueue;
 
 /**
  *
@@ -22,8 +21,8 @@ public class RP implements BattleshipsPlayer {
 
     private final static Random rnd = new Random();
     private int shipsBeforeShot;
-    private PriorityQueue<Coordinates> priorities;
-    private PriorityQueue<Coordinates> heapMap;
+    private ArrayList<Coordinates> priorities;
+    private ArrayList<Coordinates> heapMap;
     ArrayList<Coordinates> listOfGrits;
     private Coordinates shot;
     public static Coordinates[][] board;
@@ -105,7 +104,15 @@ public class RP implements BattleshipsPlayer {
             System.out.println("Priorites:" + c.x + "," + c.y);
         }
         if (!priorities.isEmpty()) {                                  //Will take the top from the priorities que.                    
-            shot = priorities.poll();                                // And removes it. 
+            shot = priorities.get(0);
+            int index=0;
+            for (int i =0; i < priorities.size(); i++) {
+                if(priorities.get(i).getPre() > shot.getPre()){
+                    shot = priorities.get(i);
+                    index=i;
+                }
+            }
+            priorities.remove(index);                                                                    // And removes it. 
             int x = shot.x;
             int y = shot.y;
             board[x][y].setPre(0);
@@ -159,9 +166,11 @@ public class RP implements BattleshipsPlayer {
                     if(placesHit[shot.x][shot.y-1]==1){
                     }
                 }
-
             }
 
+        }else{
+        placesHit[shot.x][shot.y]=-1;
+            
         }
 //            if(priorities.isEmpty()){
 //                for (Coordinates[] array : board) {
@@ -197,9 +206,6 @@ public class RP implements BattleshipsPlayer {
     @Override
     public void startMatch(int rounds) {
         //Do nothing
-        Comparator<Coordinates> comparator = new ComparatorCoordinates();
-        priorities = new PriorityQueue<>(100, comparator);
-        heapMap = new PriorityQueue<>(100, comparator);
     }
 
     /**
@@ -211,6 +217,7 @@ public class RP implements BattleshipsPlayer {
     public void startRound(int round) {
         board = new Coordinates[10][10];
         placesHit = new int[10][10];
+        priorities = new ArrayList<>();
         priorities.clear();
         setBoard(board);
         setGritShots(board);
@@ -322,35 +329,6 @@ public class RP implements BattleshipsPlayer {
         return true;
     }
 
-    private void prioritiseNabors(Coordinates shot) {
-
-        /*Easelier seen when drawing the board!
-         left nabour = board[shot.x-1][shot.y]
-         right nabour = board[shot.x+1][shot.y]
-         under nabour = board[shot.x][shot.y-1]   
-         above nabour = board[shot.x][shot.y+1]
-         */
-        if (shot.x - 1 >= 0 && board[shot.x - 1][shot.y].getPre() != 0) {
-            priorities.add(board[shot.x - 1][shot.y]);
-            board[shot.x - 1][shot.y].setPre(0);
-        }
-
-        if (shot.x + 1 <= 9 && board[shot.x + 1][shot.y].getPre() != 0) {
-            priorities.add(board[shot.x + 1][shot.y]);
-            board[shot.x + 1][shot.y].setPre(0);
-        }
-
-        if (shot.y - 1 >= 0 && board[shot.x][shot.y - 1].getPre() != 0) {
-            priorities.add(board[shot.x][shot.y - 1]);
-            board[shot.x][shot.y - 1].setPre(0);
-        }
-
-        if (shot.y + 1 <= 9 && board[shot.x][shot.y + 1].getPre() != 0) {
-            priorities.add(board[shot.x][shot.y + 1]);
-            board[shot.x][shot.y + 1].setPre(0);
-        }
-    }
-
     public void setBoard(Coordinates[][] array) {
 
         for (int i = 0; i < array.length; i++) {
@@ -460,7 +438,7 @@ public class RP implements BattleshipsPlayer {
         for (int i = placesHit.length-1; i > -1; i--) {
 
             for (int j =0; j < placesHit.length; j++) {
-                returnStatement = returnStatement +placesHit[j][i];
+                returnStatement = returnStatement +placesHit[j][i] + " ";
             }
             returnStatement = returnStatement + "\n";
         }
