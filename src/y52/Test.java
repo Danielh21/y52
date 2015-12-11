@@ -30,8 +30,8 @@ public class Test {
 //            
 //        }
         rP.setBoard(board);
-        rP.editMap();
-        rP.updateGritMap();
+//        rP.editMap();
+//        rP.updateGritMap();
 //        String returnStatement = "";
 
 //        System.out.println(board[7][2].x + "" + board[7][2].y);
@@ -46,6 +46,19 @@ public class Test {
 //        System.out.println(returnStatement);
         
         
+        rP.checkCoordinates(board[2][2]);
+        
+        String returnStatement = "";
+        
+        for (int i = board.length-1; i > -1; i--) {
+
+            for (int j =0; j < board.length; j++) {
+                returnStatement = returnStatement + " " + board[j][i].x+","+board[j][i].y;
+            }
+            returnStatement = returnStatement + "\n";
+        }
+        
+        System.out.println(returnStatement);
 }
 
     

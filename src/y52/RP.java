@@ -29,9 +29,13 @@ public class RP implements BattleshipsPlayer {
     public static Coordinates[][] board;
     private int checkShips = 1;
     public static int[][] boardIntArray;
+    public static int[][] placesHit;
     private int x;
     private int y;
     private int startShot = 0;
+    Ship Lagerst = null;
+    Ship Smallest = null;
+    
 
     public RP() {
         //hello 
@@ -136,27 +140,53 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
+        printOutHits();
         if (checkShips == 1) {
             shipsBeforeShot = enemyShips.getNumberOfShips();
             checkShips++;
         }
         if (hit) {
             System.out.println("We have a hit");
-
+            placesHit[shot.x][shot.y]=1;
             if (shipsBeforeShot > enemyShips.getNumberOfShips()) { // Means that we hit and Wrecked 
                 shipsBeforeShot = enemyShips.getNumberOfShips();
+            getLargestAndSmallest(enemyShips);
 
             } else { // Means that we hit and did not Wreck
                 ArrayList<Coordinates> nabours = shot.getNabours(shot);
                 for (Coordinates nabour : nabours) {
                     priorities.add(nabour);
+                    if(placesHit[shot.x][shot.y-1]==1){
+                    }
                 }
 
             }
 
         }
-
+//            if(priorities.isEmpty()){
+//                for (Coordinates[] array : board) {
+//                    for (Coordinates coor : array) {
+//                        
+//                   if(board[coor.x][coor.y].getPre()!=0)
+//                    checkCoordinates(coor); 
+//                    }
+//                }
+                
+//            }
     }
+
+    public void getLargestAndSmallest(Fleet enemyShips) {
+        for (Ship Ship : enemyShips) {
+            if(Ship.size() > Lagerst.size()){
+                Ship = Lagerst;
+            }
+            if(Ship.size() < Smallest.size()){
+                Ship =Smallest;
+            }
+            
+        }
+    }
+
 
     /**
      * Called in the beginning of each match to inform about the number of
@@ -180,6 +210,7 @@ public class RP implements BattleshipsPlayer {
     @Override
     public void startRound(int round) {
         board = new Coordinates[10][10];
+        placesHit = new int[10][10];
         priorities.clear();
         setBoard(board);
         setGritShots(board);
@@ -343,10 +374,10 @@ public class RP implements BattleshipsPlayer {
                 }
             }
         }        //Print out test
-        for (Coordinates coor : listOfGrits) {
-            System.out.println(coor.x + "," + coor.y);
-        }
-        System.out.println(listOfGrits.size());
+//        for (Coordinates coor : listOfGrits) {
+//            System.out.println(coor.x + "," + coor.y);
+//        }
+//        System.out.println(listOfGrits.size());
 
 
     }
@@ -364,24 +395,77 @@ public class RP implements BattleshipsPlayer {
         }
 
 //        Test to Print out the map.
-        for (Coordinates coor : heapMap) {
-            System.out.println(coor.x + "," + coor.y + "  PRE: " + coor.getPre());
-        }
-        Coordinates d = heapMap.poll();
-        System.out.println(d.x + "," + d.y);
-        d = heapMap.poll();
-        System.out.println(d.x + "," + d.y);
+//        for (Coordinates coor : heapMap) {
+//            System.out.println(coor.x + "," + coor.y + "  PRE: " + coor.getPre());
+//        }
+//        Coordinates d = heapMap.poll();
+//        System.out.println(d.x + "," + d.y);
+//        d = heapMap.poll();
+//        System.out.println(d.x + "," + d.y);
     }
     /*
      Just a Testmethod
      */
-    public void editMap(){
-        board[1][4].setPre(0);
-        board[5][2].setPre(0);
-        board[8][5].setPre(98);
-        board[8][7].setPre(95);
-        board[4][5].setPre(92);
-        board[5][4].setPre(94);
-        board[7][0].setPre(100);
+//    public void editMap(){
+//        board[1][4].setPre(0);
+//        board[5][2].setPre(0);
+//        board[8][5].setPre(98);
+//        board[8][7].setPre(95);
+//        board[4][5].setPre(92);
+//        board[5][4].setPre(94);
+//        board[7][0].setPre(100);
+//    }
+
+    public void checkCoordinates(Coordinates coor) {
+           boolean firstNabourZero=true;
+           boolean secondNabourZero=true;
+           boolean thirdNabourZero=true;
+           boolean fourthNabourZero=true;
+           
+           if(coor.x!=9){
+             if(RP.board[coor.x+1][coor.y].getPre()!=0){
+                 firstNabourZero=false;
+             }  
+           }
+           
+           if(coor.x!=0){
+             if(RP.board[coor.x-1][coor.y].getPre()!=0){
+                 secondNabourZero=false;
+             }  
+           }
+           
+           if(coor.y!=9){
+             if(RP.board[coor.x][coor.y+1].getPre()!=0){
+                 thirdNabourZero=false;
+             }  
+           }
+           
+           if(coor.y!=0){
+             if(RP.board[coor.x][coor.y-1].getPre()!=0){
+                 fourthNabourZero=false;
+             }  
+           }
+           
+           if(firstNabourZero && secondNabourZero && thirdNabourZero && fourthNabourZero){
+//               System.out.println("Removed are: " + coor.x + "," + coor.y ); 
+               board[coor.x][coor.y].setPre(0);
+           }
+        
+            
     }
+
+    private void printOutHits() {
+        String returnStatement = "";
+        
+        for (int i = placesHit.length-1; i > -1; i--) {
+
+            for (int j =0; j < placesHit.length; j++) {
+                returnStatement = returnStatement +placesHit[j][i];
+            }
+            returnStatement = returnStatement + "\n";
+        }
+        
+        System.out.println(returnStatement);
+    }
+    
 }
