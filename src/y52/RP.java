@@ -155,17 +155,22 @@ public class RP implements BattleshipsPlayer {
         if (hit) {
             System.out.println("We have a hit");
             placesHit[shot.x][shot.y]=1;
+            
+            
             if (shipsBeforeShot > enemyShips.getNumberOfShips()) { // Means that we hit and Wrecked 
                 shipsBeforeShot = enemyShips.getNumberOfShips();
             getLargestAndSmallest(enemyShips);
-
-            } else { // Means that we hit and did not Wreck
+            } 
+            
+            else { // Means that we hit and did not Wreck
                 ArrayList<Coordinates> nabours = shot.getNabours(shot);
                 for (Coordinates nabour : nabours) {
                     priorities.add(nabour);
                     if(placesHit[shot.x][shot.y-1]==1){
                     }
-                }
+                }  
+                checkNaboursV();
+                checkNaboursH();
             }
 
         }else{
@@ -438,12 +443,62 @@ public class RP implements BattleshipsPlayer {
         for (int i = placesHit.length-1; i > -1; i--) {
 
             for (int j =0; j < placesHit.length; j++) {
-                returnStatement = returnStatement +placesHit[j][i] + " ";
+                returnStatement = returnStatement +placesHit[j][i] + "\t";
             }
             returnStatement = returnStatement + "\n";
         }
         
         System.out.println(returnStatement);
+    }
+
+    private void checkNaboursV() {
+         boolean above=true;
+         boolean under=true;
+         System.out.println("*************************************************");
+         if(shot.y!=9 && placesHit[shot.x][shot.y+1] != 1 ){
+             above=false;
+         }
+         
+         if(shot.y!=0 && placesHit[shot.x][shot.y-1] != 1 ){
+             under=false;
+         }
+        
+        if(above || under){
+            
+        
+        
+        for (Coordinates coor : priorities) {
+            if(coor.x == shot.x){
+              coor.setPre(60);
+                System.out.println(coor.x + "," + coor.y + " Is set to 60");
+            }
+        }
+        }
+    }
+    
+    private void checkNaboursH() {
+         boolean right=true;
+         boolean left=true;
+         System.out.println("*************************************************");
+         if(shot.x!=9 && placesHit[shot.x+1][shot.y] != 1 ){
+             right=false;
+         }
+         
+         if(shot.x!=0 && placesHit[shot.x-1][shot.y] != 1 ){
+             left=false;
+         }
+        
+        if(right || left){
+            
+        
+        
+        for (Coordinates coor : priorities) {
+            if(coor.y == shot.y){
+              coor.setPre(60);
+                System.out.println(coor.x + "," + coor.y + " Is set to 60");
+            }
+        }
+        }
     }
     
 }
