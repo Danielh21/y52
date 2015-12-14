@@ -26,14 +26,14 @@ public class RP implements BattleshipsPlayer {
     ArrayList<Coordinates> listOfGrits;
     private Coordinates shot;
     public static Coordinates[][] board;
-    private int checkShips = 1;
+    private int checkShips;
     public static int[][] boardIntArray;
     public static int[][] placesHit;
     private int x;
     private int y;
-    private int startShot = 0;
     Ship Lagerst = null;
     Ship Smallest = null;
+    private int shipPartsLeft;
     
 
     public RP() {
@@ -100,6 +100,7 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
+        printOutHits();
         for (Coordinates c : priorities) {
             System.out.println("Priorites:" + c.x + "," + c.y);
         }
@@ -111,6 +112,11 @@ public class RP implements BattleshipsPlayer {
                     shot = priorities.get(i);
                     index=i;
                 }
+            }
+            while (shot.getPre() == 0) {                              // Makes sure that we don't shoot at something that is zero.
+                priorities.remove(index);
+                index = rnd.nextInt(priorities.size());
+                shot = priorities.get(index);
             }
             priorities.remove(index);                                                                    // And removes it. 
             int x = shot.x;
@@ -147,10 +153,11 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
-        printOutHits();
         if (checkShips == 1) {
             shipsBeforeShot = enemyShips.getNumberOfShips();
             checkShips++;
+            shipPartsLeft=shipWrecked(enemyShips);
+            System.out.println("Ship parts left set to: " + shipPartsLeft);
         }
         if (hit) {
             System.out.println("We have a hit");
@@ -159,15 +166,21 @@ public class RP implements BattleshipsPlayer {
             
             if (shipsBeforeShot > enemyShips.getNumberOfShips()) { // Means that we hit and Wrecked 
                 shipsBeforeShot = enemyShips.getNumberOfShips();
-            getLargestAndSmallest(enemyShips);
+                System.out.println("We have a Wreck");
+                int shipJustWreckedLength = shipWrecked(enemyShips);
+                System.out.println("Ship Just Wrecked " + shipJustWreckedLength);
+                findShipWrecked(shipJustWreckedLength);
+                boolean anyMore = anyMoreNaboursLeft();
+                if(!anyMore){
+                    System.out.println("Priorities Cleared!");
+                    priorities.clear();
+                }
             } 
             
             else { // Means that we hit and did not Wreck
                 ArrayList<Coordinates> nabours = shot.getNabours(shot);
                 for (Coordinates nabour : nabours) {
                     priorities.add(nabour);
-                    if(placesHit[shot.x][shot.y-1]==1){
-                    }
                 }  
                 checkNaboursV();
                 checkNaboursH();
@@ -187,18 +200,6 @@ public class RP implements BattleshipsPlayer {
 //                }
                 
 //            }
-    }
-
-    public void getLargestAndSmallest(Fleet enemyShips) {
-        for (Ship Ship : enemyShips) {
-            if(Ship.size() > Lagerst.size()){
-                Ship = Lagerst;
-            }
-            if(Ship.size() < Smallest.size()){
-                Ship =Smallest;
-            }
-            
-        }
     }
 
 
@@ -222,6 +223,8 @@ public class RP implements BattleshipsPlayer {
     public void startRound(int round) {
         board = new Coordinates[10][10];
         placesHit = new int[10][10];
+        checkShips=1;
+        shipPartsLeft=0;
         priorities = new ArrayList<>();
         priorities.clear();
         setBoard(board);
@@ -364,28 +367,7 @@ public class RP implements BattleshipsPlayer {
 
 
     }
-    /*
-     Should be called after every shot
-     */
 
-    public void updateGritMap() {
-        heapMap.clear();
-        for (Coordinates coor : listOfGrits) {
-            if (board[coor.x][coor.y].getPre() != 0) {
-
-                heapMap.add(board[coor.x][coor.y]);
-            }
-        }
-
-//        Test to Print out the map.
-//        for (Coordinates coor : heapMap) {
-//            System.out.println(coor.x + "," + coor.y + "  PRE: " + coor.getPre());
-//        }
-//        Coordinates d = heapMap.poll();
-//        System.out.println(d.x + "," + d.y);
-//        d = heapMap.poll();
-//        System.out.println(d.x + "," + d.y);
-    }
     /*
      Just a Testmethod
      */
@@ -454,7 +436,6 @@ public class RP implements BattleshipsPlayer {
     private void checkNaboursV() {
          boolean above=true;
          boolean under=true;
-         System.out.println("*************************************************");
          if(shot.y!=9 && placesHit[shot.x][shot.y+1] != 1 ){
              above=false;
          }
@@ -479,7 +460,6 @@ public class RP implements BattleshipsPlayer {
     private void checkNaboursH() {
          boolean right=true;
          boolean left=true;
-         System.out.println("*************************************************");
          if(shot.x!=9 && placesHit[shot.x+1][shot.y] != 1 ){
              right=false;
          }
@@ -500,5 +480,150 @@ public class RP implements BattleshipsPlayer {
         }
         }
     }
-    
-}
+
+    private int shipWrecked(Fleet enemyShips) {
+        /*
+        To begin with:
+        enemyShips.getShip(0).size =2
+        enemyShips.getShip(1).size =3
+        enemyShips.getShip(2).size =3
+        enemyShips.getShip(3).size =4
+        enemyShips.getShip(4).size =5
+        After the first shot, lastEnemyFleet is set to enemyShips!
+        */    
+        
+        int count = 0;
+        
+        for (Ship Ship : enemyShips) {
+            count = count + Ship.size();
+        }
+        
+        if(shipPartsLeft -2 ==count  ){
+            shipPartsLeft = count;
+            return 2;
+        }
+        if(shipPartsLeft -3 ==count  ){
+            shipPartsLeft = count;
+            return 3;
+        }
+        if(shipPartsLeft -4 ==count  ){
+            shipPartsLeft = count;
+            return 4;
+        }
+        if(shipPartsLeft -5 ==count  ){
+            shipPartsLeft = count;
+            return 5;
+        }
+        
+        
+        
+        return count; // Should only exicute the first time!
+    }
+
+    public void findShipWrecked(int shipJustWreckedLength ) {
+        /*
+        What We know:
+        shot = last place we have just hit, and we know that we just hit. 
+        shipJustWrecked = Is the length of the ship that we just Wrecked!
+        placesHit will have 1's at all in a dircetion with the length of shipJustWrecked 
+        */
+        int dircetion=0;                      // 1 means right, 2 means left, 3 means up, 4 means down  
+        
+        if(shot.x + (shipJustWreckedLength-1) <=9){ // should check to the right!
+        int count=0;
+        for (int i = 0; i < shipJustWreckedLength; i++) {
+         
+            if(placesHit[shot.x+i][shot.y] ==1){
+             count++;
+         }  
+                
+        }
+        if(count==shipJustWreckedLength){
+            dircetion=1;
+        }
+        }
+        
+       if(shot.x - (shipJustWreckedLength-1) >=0){ // should check to the left!
+        
+        int count=0;
+        for (int i = 0; i < shipJustWreckedLength; i++) {
+            if(placesHit[shot.x-i][shot.y] ==1){
+             count++;
+         }  
+                
+        }
+        if(count==shipJustWreckedLength){
+            dircetion=2;    
+        }
+        }
+        
+       if(shot.y + (shipJustWreckedLength-1) <=9){ // should check to the up!
+        
+        int count=0;
+        for (int i = 0; i < shipJustWreckedLength; i++) {
+            if(placesHit[shot.x][shot.y+i] ==1){
+             count++;
+         }  
+                
+        }
+        if(count==shipJustWreckedLength){
+            dircetion=3;
+            
+        }
+        }
+       
+       if(shot.y - (shipJustWreckedLength-1) >=0){ // should check to the below!
+        
+        int count=0;
+        for (int i = 0; i < shipJustWreckedLength; i++) {
+            if(placesHit[shot.x][shot.y-1] ==1){
+             count++;
+         }  
+                
+        }
+        if(count==shipJustWreckedLength){
+            dircetion=4;            
+        }
+        }
+       
+      if(dircetion==1){ // placeing -1 to the right
+          System.out.println("Wrecked Ship to the right of the last shot");
+          for (int i = 0; i < shipJustWreckedLength; i++) {
+              placesHit[shot.x+i][shot.y]=-1;
+          }
+          
+      } 
+      if(dircetion==2){ // placeing -1 to the left
+          System.out.println("Wrecked Ship to the left of the last shot");
+          for (int i = 0; i < shipJustWreckedLength; i++) {
+              placesHit[shot.x-i][shot.y]=-1;
+          }
+      }
+      
+      if(dircetion==3){ // placeing -1 to the up
+          System.out.println("Wrecked Ship is up from the last shot");
+          for (int i = 0; i < shipJustWreckedLength; i++) {
+              placesHit[shot.x][shot.y+i]=-1;
+          }
+      }
+      
+      if(dircetion==4){ // placeing -1 to the down
+          System.out.println("Wrecked Ship is down from the last shot");
+          for (int i = 0; i < shipJustWreckedLength; i++) {
+              placesHit[shot.x][shot.y-i]=-1;
+          }
+      }
+    }
+
+    private boolean anyMoreNaboursLeft() {
+        for (int arrays[] : placesHit) {
+            for (int num : arrays) {
+                if(num==1){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+            }

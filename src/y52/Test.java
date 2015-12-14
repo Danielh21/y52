@@ -20,17 +20,24 @@ public class Test {
     
     public static void main(String[] args) {
         RP rP = new RP();
+        Coordinates Coordi = new Coordinates();
         Coordinates[][] board = new Coordinates[10][10];
         Fleet fleet = FleetIni();
         rP.startMatch(1);
         rP.startRound(1);
+        rP.findShipWrecked(5);
 //        for (int i = 0; i < 100; i++) {
 //            Position n = rP.getFireCoordinates(fleet);
 //            System.out.println("X: " + n.x + " Y: " + n.y);
 //            
 //        }
-        rP.setBoard(board);
-        rP.getFireCoordinates(fleet);
+        
+//        rP.setBoard(board);
+//        ArrayList<Coordinates> coors =Coordi.getNabours(new Coordinates(5, 0, 1));
+//        for (Coordinates coor : coors) {
+//            System.out.println(coor.x +  "," + coor.y );
+//        }
+//        rP.getFireCoordinates(fleet);
 //        rP.editMap();
 //        rP.updateGritMap();
 //        String returnStatement = "";
@@ -47,21 +54,21 @@ public class Test {
 //        System.out.println(returnStatement);
         
         
-        rP.checkCoordinates(board[2][2]);
-        
-        String returnStatement = "";
-        
-        for (int i = board.length-1; i > -1; i--) {
-
-            for (int j =0; j < board.length; j++) {
-                returnStatement = returnStatement + " " + board[j][i].x+","+board[j][i].y;
-            }
-            returnStatement = returnStatement + "\n";
-        }
-        
-        System.out.println(returnStatement);
+//        rP.checkCoordinates(board[2][2]);
+//        
+//        String returnStatement = "";
+//        
+//        for (int i = board.length-1; i > -1; i--) {
+//
+//            for (int j =0; j < board.length; j++) {
+//                returnStatement = returnStatement + " " + board[j][i].x+","+board[j][i].y;
+//}
+//            returnStatement = returnStatement + "\n";
+//        }
+//
+//        System.out.println(returnStatement);
 }
-
+    
     
     
     

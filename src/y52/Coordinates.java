@@ -51,6 +51,9 @@ class Coordinates {
     public  ArrayList<Coordinates> getNabours(Coordinates coor){
          ArrayList<Coordinates>  nabours = new ArrayList<>();
          
+         //Coor = x=5, y=0.
+         
+         
          if(coor.x!=upperBound && RP.board[coor.x+1][coor.y].getPre()>0){
              RP.board[coor.x+1][coor.y].setPre(3);
              nabours.add(RP.board[coor.x+1][coor.y]);
@@ -59,7 +62,7 @@ class Coordinates {
          if(coor.x!=lowerBound && RP.board[coor.x-1][coor.y].getPre()>0){
               nabours.add(RP.board[coor.x-1][coor.y]);
          }
-         if(coor.y!=upperBound&& RP.board[coor.x][coor.y+1].getPre()>0){
+         if(coor.y!=upperBound && RP.board[coor.x][coor.y+1].getPre()>0){
              RP.board[coor.x][coor.y+1].setPre(2);
              nabours.add(RP.board[coor.x][coor.y+1]);
              
