@@ -25,7 +25,6 @@ public class Test {
         Fleet fleet = FleetIni();
         rP.startMatch(1);
         rP.startRound(1);
-        rP.findShipWrecked(5);
 //        for (int i = 0; i < 100; i++) {
 //            Position n = rP.getFireCoordinates(fleet);
 //            System.out.println("X: " + n.x + " Y: " + n.y);
@@ -41,7 +40,7 @@ public class Test {
 //        rP.editMap();
 //        rP.updateGritMap();
 //        String returnStatement = "";
-
+//
 //        System.out.println(board[7][2].x + "" + board[7][2].y);
 //        for (int i = board.length-1; i > -1; i--) {
 //
@@ -68,6 +67,11 @@ public class Test {
 //
 //        System.out.println(returnStatement);
 }
+//            returnStatement = returnStatement + "\n";
+//        }
+//
+//        System.out.println(returnStatement);
+//}
     
     
     

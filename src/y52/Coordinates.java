@@ -19,6 +19,7 @@ class Coordinates {
     public final int upperBound=9;
     public final int lowerBound=0;
     Random gen = new Random();
+    public Coordinates [][] board2;
             
     public Coordinates(int x, int y, int pre) {
         this.x = x;

@@ -11,7 +11,6 @@ import battleship.interfaces.Board;
 import battleship.interfaces.Ship;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Comparator;
 
 /**
  *
@@ -19,7 +18,7 @@ import java.util.Comparator;
  */
 public class RP implements BattleshipsPlayer {
 
-    private final static Random rnd = new Random();
+    private final Random rnd = new Random();
     private int shipsBeforeShot;
     private ArrayList<Coordinates> priorities;
     private ArrayList<Coordinates> heapMap;
@@ -113,7 +112,8 @@ public class RP implements BattleshipsPlayer {
                     index=i;
                 }
             }
-            while (shot.getPre() == 0) {                              // Makes sure that we don't shoot at something that is zero.
+            while (placesHit[shot.x][shot.y]!=0) {               // Makes sure to not shot twice
+                System.out.println("Removing " + shot.x + "," + shot.y);
                 priorities.remove(index);
                 index = rnd.nextInt(priorities.size());
                 shot = priorities.get(index);
@@ -127,7 +127,8 @@ public class RP implements BattleshipsPlayer {
         } else {                                               // Will only excicure if their is nothing in the prioviteque.
             int randomAtGit = rnd.nextInt(listOfGrits.size());
             shot = listOfGrits.get(randomAtGit);
-            while (board[shot.x][shot.y].getPre() == 0) {                              // Makes sure that we don't shoot at something that is zero.
+            while (placesHit[shot.x][shot.y]!=0) {                  // Makes sure that we don't shoot at something that is zero.
+                System.out.println("Removing " + shot.x + "," + shot.y);        
                 listOfGrits.remove(randomAtGit);
                 randomAtGit = rnd.nextInt(listOfGrits.size());
                 shot = listOfGrits.get(randomAtGit);
@@ -388,31 +389,31 @@ public class RP implements BattleshipsPlayer {
            boolean fourthNabourZero=true;
            
            if(coor.x!=9){
-             if(RP.board[coor.x+1][coor.y].getPre()!=0){
+             if(board[coor.x+1][coor.y].getPre()!=0){
                  firstNabourZero=false;
              }  
            }
            
            if(coor.x!=0){
-             if(RP.board[coor.x-1][coor.y].getPre()!=0){
+             if(board[coor.x-1][coor.y].getPre()!=0){
                  secondNabourZero=false;
              }  
            }
            
            if(coor.y!=9){
-             if(RP.board[coor.x][coor.y+1].getPre()!=0){
+             if(board[coor.x][coor.y+1].getPre()!=0){
                  thirdNabourZero=false;
              }  
            }
            
            if(coor.y!=0){
-             if(RP.board[coor.x][coor.y-1].getPre()!=0){
+             if(board[coor.x][coor.y-1].getPre()!=0){
                  fourthNabourZero=false;
              }  
            }
            
            if(firstNabourZero && secondNabourZero && thirdNabourZero && fourthNabourZero){
-//               System.out.println("Removed are: " + coor.x + "," + coor.y ); 
+               System.out.println("Removed are: " + coor.x + "," + coor.y ); 
                board[coor.x][coor.y].setPre(0);
            }
         
@@ -443,6 +444,14 @@ public class RP implements BattleshipsPlayer {
          if(shot.y!=0 && placesHit[shot.x][shot.y-1] != 1 ){
              under=false;
          }
+         
+         if(shot.y ==0){ // We Only need to check upstairs nabour 
+             under=false;
+         }
+         
+         if(shot.y == 9){ // We Only need to check downstairs nabour
+             above=false;
+         }
         
         if(above || under){
             
@@ -467,11 +476,17 @@ public class RP implements BattleshipsPlayer {
          if(shot.x!=0 && placesHit[shot.x-1][shot.y] != 1 ){
              left=false;
          }
+        if(shot.x ==0){ // We Only need to check right nabour 
+             left=false;
+         }
+         
+         if(shot.x == 9){ // We Only need to check left nabour
+            right=false;
+             
+         }
         
-        if(right || left){
-            
-        
-        
+        if(right || left){ 
+           
         for (Coordinates coor : priorities) {
             if(coor.y == shot.y){
               coor.setPre(60);
