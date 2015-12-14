@@ -33,6 +33,8 @@ public class RP implements BattleshipsPlayer {
     Ship Lagerst = null;
     Ship Smallest = null;
     private int shipPartsLeft;
+    ArrayList<Integer> ships;
+    ArrayList<Coordinates> availableLoc;
     
 
     public RP() {
@@ -640,5 +642,40 @@ public class RP implements BattleshipsPlayer {
         }
         return false;
     }
-
+    
+    public void shipPossibleLoc(){
+        int lookForShip = ships.get(ships.size()-1);
+        System.out.println(""+ lookForShip);
+        Coordinates startHere;
+//        int counter=0;
+        //checks possible locations of ship vertically
+        
+        for (int j = 0; j <= 9; j++) { //pick an available shooting point
+            for (int i = 9; i >= 0; i--) {
+                        if (placesHit[j][i] == 0) {
+                            startHere = new Coordinates();
+                            startHere.setX(j);
+                            startHere.setY(i);
+                            if (startHere.x <= 9 && startHere.y - lookForShip >= 0) {
+                                 availableLoc.add(startHere);
+                            }
+                        }
+                }
+        }
+        
+        //checks possible locations of ship horizontally
+        
+        for (int k = 9; k >= 0; k--) { //pick an available shooting point
+            for (int l = 0; l <= 9; l=l+lookForShip) {
+                if (placesHit[l][k] == 0) {
+                    startHere = new Coordinates();
+                    startHere.setX(l);
+                    startHere.setY(k);
+                    if(startHere.x +lookForShip <= 9 && startHere.y >= 0){
+                        availableLoc.add(startHere);
+                    }
+                }
             }
+        }
+    }
+}

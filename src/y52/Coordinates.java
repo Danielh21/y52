@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 class Coordinates {
     
-    public final int x;
-    public final int y;
+    public  int x;
+    public  int y;
     public int pre;
     public final int upperBound=9;
     public final int lowerBound=0;
@@ -35,6 +35,14 @@ class Coordinates {
 
     public void setPre(int pre) {
         this.pre = pre;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public int getX() {
