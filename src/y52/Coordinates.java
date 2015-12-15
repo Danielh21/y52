@@ -7,6 +7,7 @@ package y52;
 
 import java.util.Random;
 import java.util.ArrayList;
+import battleship.interfaces.Position;
 /**
  *
  * @author Daniel
@@ -57,28 +58,26 @@ class Coordinates {
         return pre;
     }
     
-    public  ArrayList<Coordinates> getNabours(Coordinates coor){
-         ArrayList<Coordinates>  nabours = new ArrayList<>();
+    public  ArrayList<Position> getNabours(Coordinates coor){
+         ArrayList<Position>  nabours = new ArrayList<>();
          
          //Coor = x=5, y=0.
          
          
-         if(coor.x!=upperBound && RP.board[coor.x+1][coor.y].getPre()>0){
-             RP.board[coor.x+1][coor.y].setPre(3);
-             nabours.add(RP.board[coor.x+1][coor.y]);
-             
+         if(coor.x!=upperBound){
+             nabours.add(new Position(coor.x+1, coor.y));
          }
-         if(coor.x!=lowerBound && RP.board[coor.x-1][coor.y].getPre()>0){
-              nabours.add(RP.board[coor.x-1][coor.y]);
+         
+         if(coor.x!=lowerBound){
+              nabours.add(new Position(coor.x-1, coor.y));
          }
-         if(coor.y!=upperBound && RP.board[coor.x][coor.y+1].getPre()>0){
-             RP.board[coor.x][coor.y+1].setPre(2);
-             nabours.add(RP.board[coor.x][coor.y+1]);
-             
+         
+         if(coor.y!=upperBound){
+             nabours.add(new Position(coor.x, coor.y+1));
          }
-         if(coor.y!=lowerBound && RP.board[coor.x][coor.y-1].getPre()>0){
-             nabours.add(RP.board[coor.x][coor.y-1]);
-             
+         
+         if(coor.y!=lowerBound){
+             nabours.add(new Position(coor.x, coor.y-1));
          }
          
          return nabours;
