@@ -21,7 +21,6 @@ public class RP implements BattleshipsPlayer {
     private final Random rnd = new Random();
     private int shipsBeforeShot;
     private ArrayList<Coordinates> priorities;
-    private ArrayList<Coordinates> heapMap;
     ArrayList<Coordinates> listOfGrits;
     private Coordinates shot;
     public static Coordinates[][] board;
@@ -33,8 +32,9 @@ public class RP implements BattleshipsPlayer {
     Ship Lagerst = null;
     Ship Smallest = null;
     private int shipPartsLeft;
-    ArrayList<Integer> ships;
-    ArrayList<Coordinates> availableLoc;
+    private ArrayList<Integer> ships;
+    private ArrayList<Coordinates> availableLoc;
+    private ArrayList<Coordinates> searchShipsHere;
     
 
     public RP() {
@@ -173,11 +173,16 @@ public class RP implements BattleshipsPlayer {
                 int shipJustWreckedLength = shipWrecked(enemyShips);
                 System.out.println("Ship Just Wrecked " + shipJustWreckedLength);
                 findShipWrecked(shipJustWreckedLength);
+                ships.remove(shipJustWreckedLength);   //removes from the list of ships
                 boolean anyMore = anyMoreNaboursLeft();
                 if(!anyMore){
                     System.out.println("Priorities Cleared!");
                     priorities.clear();
                 }
+                shipPossibleLoc();
+//                for (Coordinates e : availableLoc) {    //printing available locations
+//                    System.out.println(e.x + "," + e.y);
+//                }
             } 
             
             else { // Means that we hit and did not Wreck
@@ -232,6 +237,15 @@ public class RP implements BattleshipsPlayer {
         priorities.clear();
         setBoard(board);
         setGritShots(board);
+        
+        availableLoc = new ArrayList<>();
+        searchShipsHere = new ArrayList<>();
+        ships = new ArrayList<>();
+        ships.add(2);
+        ships.add(3);
+        ships.add(3);
+        ships.add(4);
+        ships.add(5);
     }
 
     /**
@@ -645,37 +659,41 @@ public class RP implements BattleshipsPlayer {
     
     public void shipPossibleLoc(){
         int lookForShip = ships.get(ships.size()-1);
-        System.out.println(""+ lookForShip);
+        System.out.println("size"+ lookForShip);
         Coordinates startHere;
-//        int counter=0;
         //checks possible locations of ship vertically
         
-        for (int j = 0; j <= 9; j++) { //pick an available shooting point
-            for (int i = 9; i >= 0; i--) {
-                        if (placesHit[j][i] == 0) {
-                            startHere = new Coordinates();
-                            startHere.setX(j);
-                            startHere.setY(i);
-                            if (startHere.x <= 9 && startHere.y - lookForShip >= 0) {
-                                 availableLoc.add(startHere);
-                            }
+        for (int yY = 9; yY >= 0; yY--) { //pick an available shooting point
+            for (int xX= 0; xX < 10; xX = xX + lookForShip) {
+                    int counter = 0;
+                    do {
+                        if (placesHit[xX + counter][yY] == 0) {
+                            counter++;
                         }
+                    } while (counter < lookForShip);
+                    startHere = new Coordinates();
+                    startHere.setX(xX);
+                    startHere.setY(yY);
+                    availableLoc.add(startHere);
                 }
         }
+        
+        
         
         //checks possible locations of ship horizontally
         
-        for (int k = 9; k >= 0; k--) { //pick an available shooting point
-            for (int l = 0; l <= 9; l=l+lookForShip) {
-                if (placesHit[l][k] == 0) {
-                    startHere = new Coordinates();
-                    startHere.setX(l);
-                    startHere.setY(k);
-                    if(startHere.x +lookForShip <= 9 && startHere.y >= 0){
-                        availableLoc.add(startHere);
-                    }
-                }
-            }
-        }
+//        for (int k = 9; k >= 0; k--) { //pick an available shooting point
+//            for (int l = 0; l <= 9; l=l+lookForShip) {
+//                if (placesHit[l][k] == 0) {
+//                    startHere = new Coordinates();
+//                    startHere.setX(l);
+//                    startHere.setY(k);
+//                    if(startHere.x +lookForShip <= 9 && startHere.y >= 0){
+//                        availableLoc.add(startHere);
+//                    }
+//                }
+//            }
+//        }
+//    }
     }
 }
