@@ -24,10 +24,10 @@ public class RP implements BattleshipsPlayer {
     private ArrayList<Coordinates> heapMap;
     ArrayList<Coordinates> listOfGrits;
     private Coordinates shot;
-    public static Coordinates[][] board;
+    public Coordinates[][] board;
     private int checkShips;
-    public static int[][] boardIntArray;
-    public static int[][] placesHit;
+    public int[][] boardIntArray;
+    public int[][] placesHit;
     private int x;
     private int y;
     Ship Lagerst = null;
@@ -181,9 +181,13 @@ public class RP implements BattleshipsPlayer {
             } 
             
             else { // Means that we hit and did not Wreck
-                ArrayList<Coordinates> nabours = shot.getNabours(shot);
-                for (Coordinates nabour : nabours) {
-                    priorities.add(nabour);
+                ArrayList<Position> nabours = shot.getNabours(shot);
+                for (Position nabour : nabours) {
+                    if(!(nabour.x >9 || nabour.y > 9 || nabour.x< 0 || nabour.y<0)){
+                        if(board[nabour.x][nabour.y].getPre()!=0){
+                            priorities.add(board[nabour.x][nabour.y]);
+                        }
+                    }
                 }  
                 checkNaboursV();
                 checkNaboursH();
