@@ -34,6 +34,11 @@ public class RP implements BattleshipsPlayer {
     private int shipPartsLeft;
     private ArrayList<Integer> ships;
     private ArrayList<Coordinates> availableLoc;
+    private ArrayList<Coordinates> searchShipsHere;
+    private int enemyShotCounter;
+    private ArrayList<Position> ownShipPlacement;
+    private ArrayList<Boolean> ownShipDirction;
+    private boolean enemeyOver60shots;
     
     public int[][]posShipsLoc;
     
