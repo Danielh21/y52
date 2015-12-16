@@ -34,11 +34,8 @@ public class RP implements BattleshipsPlayer {
     private int shipPartsLeft;
     private ArrayList<Integer> ships;
     private ArrayList<Coordinates> availableLoc;
-    private ArrayList<Coordinates> searchShipsHere;
-    private int enemyShotCounter;
-    private ArrayList<Position> ownShipPlacement;
-    private ArrayList<Boolean> ownShipDirction;
-    private boolean enemeyOver60shots;
+    
+    public int[][]posShipsLoc;
     
 
     public RP() {
@@ -191,13 +188,19 @@ public class RP implements BattleshipsPlayer {
                 int shipJustWreckedLength = shipWrecked(enemyShips);
                 System.out.println("Ship Just Wrecked " + shipJustWreckedLength);
                 findShipWrecked(shipJustWreckedLength);
-                ships.remove(shipJustWreckedLength);   //removes from the list of ships
+                //removes from the list of ships
+                removeFromShips(shipJustWreckedLength);
+                
+                System.out.println("removed:" + shipJustWreckedLength);
                 boolean anyMore = anyMoreNaboursLeft();
                 if(!anyMore){
                     System.out.println("Priorities Cleared!");
                     priorities.clear();
                 }
-//                shipPossibleLoc();
+                System.out.println("****");
+                shipPossibleLoc();
+                printAvailableLocation();
+                
 //                for (Coordinates e : availableLoc) {    //printing available locations
 //                    System.out.println(e.x + "," + e.y);
 //                }
@@ -232,6 +235,7 @@ public class RP implements BattleshipsPlayer {
 //            }
     }
 
+    
 
     /**
      * Called in the beginning of each match to inform about the number of
@@ -264,7 +268,6 @@ public class RP implements BattleshipsPlayer {
         setGritShots(board);
         enemyShotCounter=0;
         availableLoc = new ArrayList<>();
-        searchShipsHere = new ArrayList<>();
         ships = new ArrayList<>();
         ships.add(2);
         ships.add(3);
@@ -691,24 +694,31 @@ public class RP implements BattleshipsPlayer {
     }
     
     public void shipPossibleLoc(){
-        int lookForShip = ships.get(ships.size()-1);
+        int l = ships.size()-1;
+        int lookForShip = ships.get(l);
         System.out.println("size"+ lookForShip);
         Coordinates startHere;
-        //checks possible locations of ship vertically
+        int lastX = 0;
         
-        for (int yY = 9; yY >= 0; yY--) { //pick an available shooting point
-            for (int xX= 0; xX < 10; xX = xX + lookForShip) {
-                    int counter = 0;
-                    do {
-                        if (placesHit[xX + counter][yY] == 0) {
-                            counter++;
-                        }
-                    } while (counter < lookForShip);
+        //checks possible locations of ship horizontally
+        for (int yY = 9; yY >= 0; yY--) { 
+            for (int xX= 0; xX < 10; xX++) {
+                if (placesHit[xX][yY] == 0) {       //checks if the first coordinate is 0
+                    for (int i = 1; i < lookForShip; i++) { //continue checking consecutive coordinates if 0s
+                        if (placesHit[xX+i][yY] == 0) {
+                            lastX = xX+i;
+                        } else {
+                            i = lookForShip;
+                            lastX = xX + i;
+                        }   
+                    }
+                    xX= lastX;
                     startHere = new Coordinates();
                     startHere.setX(xX);
                     startHere.setY(yY);
                     availableLoc.add(startHere);
                 }
+            }
         }
         
         
@@ -729,4 +739,20 @@ public class RP implements BattleshipsPlayer {
 //        }
 //    }
     }
+
+    private void removeFromShips(int shipJustWreckedLength) {
+        for (int i = 0; i < ships.size(); i++) {
+            if(ships.get(i)== shipJustWreckedLength){
+                ships.remove(i);
+                return;
+            }
+        }
+    }
+
+public void printAvailableLocation() {
+        for (Coordinates e : availableLoc) {
+            System.out.println(e.x+","+e.y);
+        }
+    }
+    
 }
