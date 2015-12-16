@@ -35,6 +35,10 @@ public class RP implements BattleshipsPlayer {
     private ArrayList<Integer> ships;
     private ArrayList<Coordinates> availableLoc;
     private ArrayList<Coordinates> searchShipsHere;
+    private int enemyShotCounter;
+    private ArrayList<Position> ownShipPlacement;
+    private ArrayList<Boolean> ownShipDirction;
+    private boolean enemeyOver60shots;
     
 
     public RP() {
@@ -68,12 +72,21 @@ public class RP implements BattleshipsPlayer {
         Ship ship302 = fleet.getShip(2); //length 3
         Ship ship4 = fleet.getShip(3); //length 4
         Ship ship5 = fleet.getShip(4); //length 5
+        
+        if(enemeyOver60shots){
+            board.placeShip(ownShipPlacement.get(0), ship2, ownShipDirction.get(0));
+            board.placeShip(ownShipPlacement.get(1), ship301, ownShipDirction.get(1));
+            board.placeShip(ownShipPlacement.get(2), ship302, ownShipDirction.get(2));
+            board.placeShip(ownShipPlacement.get(3), ship4, ownShipDirction.get(3));
+            board.placeShip(ownShipPlacement.get(4), ship5, ownShipDirction.get(4));
+        }else{
 
         findRandomPlace(ship2, board, "s1");
         findRandomPlace(ship301, board, "s2");
         findRandomPlace(ship302, board, "s3");
         findRandomPlace(ship4, board, "s4");
         findRandomPlace(ship5, board, "s5");
+        }
     }
 
     /**
@@ -87,6 +100,7 @@ public class RP implements BattleshipsPlayer {
     @Override
     public void incoming(Position pos) {
         //Do nothing
+        enemyShotCounter++; // is gonna be equal to the number of enemyShots
     }
 
     /**
@@ -161,6 +175,10 @@ public class RP implements BattleshipsPlayer {
             checkShips++;
             shipPartsLeft=shipWrecked(enemyShips);
             System.out.println("Ship parts left set to: " + shipPartsLeft);
+            for (int i = 0; i < ownShipPlacement.size(); i++) {
+                System.out.println("That goes in to the code: "  + ownShipPlacement.get(i).x + "," +  ownShipPlacement.get(i).y + ownShipDirction.get(i) );
+                
+            }
         }
         if (hit) {
             System.out.println("We have a hit");
@@ -179,7 +197,7 @@ public class RP implements BattleshipsPlayer {
                     System.out.println("Priorities Cleared!");
                     priorities.clear();
                 }
-                shipPossibleLoc();
+//                shipPossibleLoc();
 //                for (Coordinates e : availableLoc) {    //printing available locations
 //                    System.out.println(e.x + "," + e.y);
 //                }
@@ -224,6 +242,9 @@ public class RP implements BattleshipsPlayer {
     @Override
     public void startMatch(int rounds) {
         //Do nothing
+        enemeyOver60shots=false;
+        ownShipPlacement = new ArrayList<>();
+        ownShipDirction = new ArrayList<>();
     }
 
     /**
@@ -241,7 +262,7 @@ public class RP implements BattleshipsPlayer {
         priorities.clear();
         setBoard(board);
         setGritShots(board);
-        
+        enemyShotCounter=0;
         availableLoc = new ArrayList<>();
         searchShipsHere = new ArrayList<>();
         ships = new ArrayList<>();
@@ -264,7 +285,14 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public void endRound(int round, int points, int enemyPoints) {
-        //Do nothing
+        
+        if(enemyShotCounter >= 60){
+            enemeyOver60shots=true;
+        }else{
+            enemeyOver60shots=false;
+            ownShipDirction.clear();
+            ownShipPlacement.clear();
+        }
     }
 
     /**
@@ -328,8 +356,9 @@ public class RP implements BattleshipsPlayer {
 
                 }
             }
+            ownShipPlacement.add(new Position(x, y));
+            ownShipDirction.add(horrOrVert);
             board.placeShip(new Position(x, y), ship, horrOrVert);
-
         }
     }
 
