@@ -29,8 +29,6 @@ public class RP implements BattleshipsPlayer {
     public int[][] placesHit;
     private int x;
     private int y;
-    Ship Lagerst = null;
-    Ship Smallest = null;
     private int shipPartsLeft;
     private ArrayList<Integer> ships;
     private ArrayList<Coordinates> availableLoc;
@@ -39,8 +37,8 @@ public class RP implements BattleshipsPlayer {
     private ArrayList<Position> ownShipPlacement;
     private ArrayList<Boolean> ownShipDirction;
     private boolean enemeyOver60shots;
-    
     public int[][]posShipsLoc;
+    public int ownShots;
     
 
     public RP() {
@@ -117,6 +115,7 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public Position getFireCoordinates(Fleet enemyShips) {
+        printOutPossibleLocations();
         printOutHits();
         for (Coordinates c : priorities) {
             System.out.println("Priorites:" + c.x + "," + c.y);
@@ -142,7 +141,7 @@ public class RP implements BattleshipsPlayer {
             board[x][y].setPre(0);
             System.out.println("Shoots nabours at: " + x + "," + y);
             return new Position(x, y);
-        } else {                                               // Will only excicure if their is nothing in the prioviteque.
+        } else if(ownShots <=20) {                                               // Will only excicure if their is nothing in the prioviteque.
             int randomAtGit = rnd.nextInt(listOfGrits.size());
             shot = listOfGrits.get(randomAtGit);
             while (placesHit[shot.x][shot.y]!=0) {                  // Makes sure that we don't shoot at something that is zero.
@@ -158,6 +157,14 @@ public class RP implements BattleshipsPlayer {
             System.out.println("Shoots from grit at: " + x + "," + y);
             return new Position(x, y);
         }
+        else{
+            shot = getMostLikely();
+            int x = shot.x;
+            int y = shot.y;
+            board[x][y].setPre(0);
+            System.out.println("Shooting from posible Ship Location at " + shot.x + "," + shot.y);
+            return new Position(x,y);
+        }
     }
 
     /**
@@ -172,15 +179,14 @@ public class RP implements BattleshipsPlayer {
      */
     @Override
     public void hitFeedBack(boolean hit, Fleet enemyShips) {
+        posShipsLoc = new int[10][10];
+        posibleLocationReset();
+        ownShots++;
         if (checkShips == 1) {
             shipsBeforeShot = enemyShips.getNumberOfShips();
             checkShips++;
             shipPartsLeft=shipWrecked(enemyShips);
             System.out.println("Ship parts left set to: " + shipPartsLeft);
-            for (int i = 0; i < ownShipPlacement.size(); i++) {
-                System.out.println("That goes in to the code: "  + ownShipPlacement.get(i).x + "," +  ownShipPlacement.get(i).y + ownShipDirction.get(i) );
-                
-            }
         }
         if (hit) {
             System.out.println("We have a hit");
@@ -202,13 +208,9 @@ public class RP implements BattleshipsPlayer {
                     System.out.println("Priorities Cleared!");
                     priorities.clear();
                 }
-                System.out.println("****");
-                shipPossibleLoc();
-                printAvailableLocation();
-                
-//                for (Coordinates e : availableLoc) {    //printing available locations
-//                    System.out.println(e.x + "," + e.y);
-//                }
+                calculateShipLocationVertical();
+                calculateShipLocationHorrisontal();
+
             } 
             
             else { // Means that we hit and did not Wreck
@@ -226,7 +228,8 @@ public class RP implements BattleshipsPlayer {
 
         }else{
         placesHit[shot.x][shot.y]=-1;
-            
+        posShipsLoc[shot.x][shot.y]=-1;
+        if(priorities.isEmpty())calculateShipLocationHorrisontal(); calculateShipLocationVertical();
         }
 //            if(priorities.isEmpty()){
 //                for (Coordinates[] array : board) {
@@ -272,6 +275,7 @@ public class RP implements BattleshipsPlayer {
         setBoard(board);
         setGritShots(board);
         enemyShotCounter=0;
+        posShipsLoc= new int[10][10];
         availableLoc = new ArrayList<>();
         ships = new ArrayList<>();
         ships.add(2);
@@ -279,6 +283,7 @@ public class RP implements BattleshipsPlayer {
         ships.add(3);
         ships.add(4);
         ships.add(5);
+        ownShots=0;
     }
 
     /**
@@ -478,7 +483,7 @@ public class RP implements BattleshipsPlayer {
     }
 
     private void printOutHits() {
-        String returnStatement = "";
+        String returnStatement = "Places Hit:\n";
         
         for (int i = placesHit.length-1; i > -1; i--) {
 
@@ -662,6 +667,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship to the right of the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x+i][shot.y]=-1;
+              posShipsLoc[shot.x+i][shot.y]=-1;
           }
           
       } 
@@ -669,6 +675,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship to the left of the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x-i][shot.y]=-1;
+              posShipsLoc[shot.x+i][shot.y]=-1;
           }
       }
       
@@ -676,6 +683,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship is up from the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x][shot.y+i]=-1;
+              posShipsLoc[shot.x+i][shot.y]=-1;
           }
       }
       
@@ -683,6 +691,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship is down from the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x][shot.y-i]=-1;
+              posShipsLoc[shot.x+i][shot.y]=-1;
           }
       }
     }
@@ -755,9 +764,135 @@ public class RP implements BattleshipsPlayer {
     }
 
 public void printAvailableLocation() {
-        for (Coordinates e : availableLoc) {
-            System.out.println(e.x+","+e.y);
+        for (int i = 0; i < availableLoc.size(); i++) {
+            System.out.println(availableLoc.get(i).x  + "," + availableLoc.get(i).y);
+        
+    }
+    }
+
+private void printOutPossibleLocations() {
+        String returnStatement = "PossibleShip Locations \n";
+        
+        for (int i = posShipsLoc.length-1; i > -1; i--) {
+
+            for (int j =0; j < posShipsLoc.length; j++) {
+                returnStatement = returnStatement +posShipsLoc[j][i] + "\t";
+            }
+            returnStatement = returnStatement + "\n";
         }
+        
+        System.out.println(returnStatement);
+    }
+
+    public void calculateShipLocationHorrisontal() {
+        int lengthOfLargest = getLagrestShip();
+
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+                {
+                    int counter = 0;
+                    if (posShipsLoc[i][j] != -1) {
+
+                        if (i + lengthOfLargest - 1 <= 9) { // We have a coordinate that is not already hit,
+                            // and won't go out of bounce of checking for the largest ship
+
+                            for (int k = 1; k < lengthOfLargest; k++) {
+
+                                if (posShipsLoc[i + k][j] == -1) {
+                                    counter++;
+                                }
+                            }
+
+                            for (int h = 0; h < lengthOfLargest; h++) {
+                                if (counter == 0) {
+                                    int last = posShipsLoc[i + h][j];
+                                    posShipsLoc[i + h][j] = last + 1;
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+ 
+public void calculateShipLocationVertical() {
+        int lengthOfLargest = getLagrestShip();
+
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+                {
+                    int counter = 0;
+                    if (posShipsLoc[i][j] != -1) {
+
+                        if (j + lengthOfLargest - 1 <= 9) { // We have a coordinate that is not already hit,
+                            // and won't go out of bounce of checking for the largest ship
+
+                            for (int k = 1; k < lengthOfLargest; k++) {
+
+                                if (posShipsLoc[i][j+k] == -1) {
+                                    counter++;
+                                }
+                            }
+
+                            for (int h = 0; h < lengthOfLargest; h++) {
+                                if (counter == 0) {
+                                    int last = posShipsLoc[i][j + h ];
+                                    posShipsLoc[i][j + h ] = last + 1;
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+ 
+ public int getLagrestShip(){
+     int i =0;
+     for (int shiplength : ships) {
+         if(shiplength > i){
+             i=shiplength;
+         }
+     }
+     return i;
+ }
+
+    private void posibleLocationReset() {
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+                if(placesHit[i][j] == -1){
+                    posShipsLoc[i][j]=-1;
+                }
+            }
+        }
+    }
+
+    private Coordinates getMostLikely() {
+        int lar = -1;
+        int xLar =-1;
+        int yLar =-1;
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+            if(posShipsLoc[i][j] > lar){
+                lar= posShipsLoc[i][j];
+                xLar = i;
+                yLar = j;
+            }
+            
+            
+            
+            }
+            
+            }
+        Coordinates mostLikely = new Coordinates(xLar, yLar, 1);
+        return mostLikely;
     }
     
 }
