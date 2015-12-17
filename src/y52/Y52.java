@@ -34,7 +34,7 @@ public class Y52 implements PlayerFactory<BattleshipsPlayer>
     @Override
     public String getName()
     {
-        return "Cherry and Daniel";
+        return "The Force Is Strong With This One";
     }
     
 }
