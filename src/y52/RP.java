@@ -31,7 +31,6 @@ public class RP implements BattleshipsPlayer {
     private int y;
     private int shipPartsLeft;
     private ArrayList<Integer> ships;
-    private ArrayList<Coordinates> availableLoc;
     private int enemyShotCounter;
     private ArrayList<Position> ownShipPlacement;
     private ArrayList<Boolean> ownShipDirction;
@@ -211,7 +210,10 @@ public class RP implements BattleshipsPlayer {
                 }
                 calculateShipLocationVertical();
                 calculateShipLocationHorrisontal();
-
+                if(enemyShips.getNumberOfShips()>1){
+                calculateShipLocationHorrisontalSmallest();
+                calculateShipLocationVerticalSmallest();
+                }
             } 
             
             else { // Means that we hit and did not Wreck
@@ -230,7 +232,14 @@ public class RP implements BattleshipsPlayer {
         }else{
         placesHit[shot.x][shot.y]=-1;
         posShipsLoc[shot.x][shot.y]=-1;
-        if(priorities.isEmpty())calculateShipLocationHorrisontal(); calculateShipLocationVertical();
+        if(priorities.isEmpty()){
+         calculateShipLocationHorrisontal();
+         calculateShipLocationVertical();
+         if(enemyShips.getNumberOfShips()>1){
+         calculateShipLocationHorrisontalSmallest();
+         calculateShipLocationVerticalSmallest();
+         }
+        }
         }
     }
 
@@ -267,7 +276,6 @@ public class RP implements BattleshipsPlayer {
         setGritShots(board);
         enemyShotCounter=0;
         posShipsLoc= new int[10][10];
-        availableLoc = new ArrayList<>();
         ships = new ArrayList<>();
         ownShots=0;
     }
@@ -703,13 +711,6 @@ public class RP implements BattleshipsPlayer {
         }
     }
 
-public void printAvailableLocation() {
-        for (int i = 0; i < availableLoc.size(); i++) {
-            System.out.println(availableLoc.get(i).x  + "," + availableLoc.get(i).y);
-        
-    }
-    }
-
 private void printOutPossibleLocations() {
         String returnStatement = "PossibleShip Locations \n";
         
@@ -794,6 +795,77 @@ public void calculateShipLocationVertical() {
             }
         }
     }
+
+public void calculateShipLocationHorrisontalSmallest() {
+        int lengthOfSmallest = getSmallestShip();
+
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+                {
+                    int counter = 0;
+                    if (posShipsLoc[i][j] != -1) {
+
+                        if (i + lengthOfSmallest - 1 <= 9) { // We have a coordinate that is not already hit,
+                            // and won't go out of bounce of checking for the largest ship
+
+                            for (int k = 1; k < lengthOfSmallest; k++) {
+
+                                if (posShipsLoc[i + k][j] == -1) {
+                                    counter++;
+                                }
+                            }
+
+                            for (int h = 0; h < lengthOfSmallest; h++) {
+                                if (counter == 0) {
+                                    int last = posShipsLoc[i + h][j];
+                                    posShipsLoc[i + h][j] = last + 1;
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+ 
+public void calculateShipLocationVerticalSmallest() {
+        int lengthOfSmallest = getSmallestShip();
+        System.out.println("Now Looking for " + lengthOfSmallest);
+
+        for (int i = 0; i < posShipsLoc.length; i++) {
+            for (int j = 0; j < posShipsLoc[i].length; j++) {
+                {
+                    int counter = 0;
+                    if (posShipsLoc[i][j] != -1) {
+
+                        if (j + lengthOfSmallest - 1 <= 9) { // We have a coordinate that is not already hit,
+                            // and won't go out of bounce of checking for the largest ship
+
+                            for (int k = 1; k < lengthOfSmallest; k++) {
+
+                                if (posShipsLoc[i][j+k] == -1) {
+                                    counter++;
+                                }
+                            }
+
+                            for (int h = 0; h < lengthOfSmallest; h++) {
+                                if (counter == 0) {
+                                    int last = posShipsLoc[i][j + h ];
+                                    posShipsLoc[i][j + h ] = last + 1;
+                                }
+                            }
+
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
  
  public int getLagrestShip(){
      int i =0;
@@ -804,6 +876,16 @@ public void calculateShipLocationVertical() {
      }
      return i;
  }
+ 
+ private int getSmallestShip() {
+    int i =99;
+     for (int shiplength : ships) {
+         if(shiplength < i){
+             i=shiplength;
+         }
+     }
+     return i;
+    }
 
     private void posibleLocationReset() {
         for (int i = 0; i < posShipsLoc.length; i++) {
