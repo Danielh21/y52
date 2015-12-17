@@ -32,7 +32,6 @@ public class RP implements BattleshipsPlayer {
     private int shipPartsLeft;
     private ArrayList<Integer> ships;
     private ArrayList<Coordinates> availableLoc;
-    private ArrayList<Coordinates> searchShipsHere;
     private int enemyShotCounter;
     private ArrayList<Position> ownShipPlacement;
     private ArrayList<Boolean> ownShipDirction;
@@ -86,7 +85,7 @@ public class RP implements BattleshipsPlayer {
         findRandomPlace(ship302, board, "s3");
         findRandomPlace(ship4, board, "s4");
         findRandomPlace(ship5, board, "s5");
-        }
+    }
     }
 
     /**
@@ -184,9 +183,10 @@ public class RP implements BattleshipsPlayer {
         ownShots++;
         if (checkShips == 1) {
             shipsBeforeShot = enemyShips.getNumberOfShips();
-            checkShips++;
             shipPartsLeft=shipWrecked(enemyShips);
             System.out.println("Ship parts left set to: " + shipPartsLeft);
+            addToShips(enemyShips);
+            checkShips++;
         }
         if (hit) {
             System.out.println("We have a hit");
@@ -201,12 +201,13 @@ public class RP implements BattleshipsPlayer {
                 findShipWrecked(shipJustWreckedLength);
                 //removes from the list of ships
                 removeFromShips(shipJustWreckedLength);
-                
-                System.out.println("removed:" + shipJustWreckedLength);
                 boolean anyMore = anyMoreNaboursLeft();
                 if(!anyMore){
                     System.out.println("Priorities Cleared!");
                     priorities.clear();
+                }else{
+                    System.out.println("Findes other nabours");
+                    findOtherNabours();   
                 }
                 calculateShipLocationVertical();
                 calculateShipLocationHorrisontal();
@@ -231,16 +232,6 @@ public class RP implements BattleshipsPlayer {
         posShipsLoc[shot.x][shot.y]=-1;
         if(priorities.isEmpty())calculateShipLocationHorrisontal(); calculateShipLocationVertical();
         }
-//            if(priorities.isEmpty()){
-//                for (Coordinates[] array : board) {
-//                    for (Coordinates coor : array) {
-//                        
-//                   if(board[coor.x][coor.y].getPre()!=0)
-//                    checkCoordinates(coor); 
-//                    }
-//                }
-                
-//            }
     }
 
     
@@ -278,11 +269,6 @@ public class RP implements BattleshipsPlayer {
         posShipsLoc= new int[10][10];
         availableLoc = new ArrayList<>();
         ships = new ArrayList<>();
-        ships.add(2);
-        ships.add(3);
-        ships.add(3);
-        ships.add(4);
-        ships.add(5);
         ownShots=0;
     }
 
@@ -675,7 +661,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship to the left of the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x-i][shot.y]=-1;
-              posShipsLoc[shot.x+i][shot.y]=-1;
+              posShipsLoc[shot.x-i][shot.y]=-1;
           }
       }
       
@@ -683,7 +669,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship is up from the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x][shot.y+i]=-1;
-              posShipsLoc[shot.x+i][shot.y]=-1;
+              posShipsLoc[shot.x][shot.y+i]=-1;
           }
       }
       
@@ -691,7 +677,7 @@ public class RP implements BattleshipsPlayer {
           System.out.println("Wrecked Ship is down from the last shot");
           for (int i = 0; i < shipJustWreckedLength; i++) {
               placesHit[shot.x][shot.y-i]=-1;
-              posShipsLoc[shot.x+i][shot.y]=-1;
+              posShipsLoc[shot.x][shot.y-i]=-1;
           }
       }
     }
@@ -707,56 +693,10 @@ public class RP implements BattleshipsPlayer {
         return false;
     }
     
-    public void shipPossibleLoc(){
-        int l = ships.size()-1;
-        int lookForShip = ships.get(l);
-        System.out.println("size"+ lookForShip);
-        Coordinates startHere;
-        int lastX = 0;
-        
-        //checks possible locations of ship horizontally
-        for (int yY = 9; yY >= 0; yY--) { 
-            for (int xX= 0; xX < 10; xX++) {
-                if (placesHit[xX][yY] == 0) {       //checks if the first coordinate is 0
-                    for (int i = 1; i < lookForShip; i++) { //continue checking consecutive coordinates if 0s
-                        if (placesHit[xX+i][yY] == 0) {
-                            lastX = xX+i;
-                        } else {
-                            i = lookForShip;
-                            lastX = xX + i;
-                        }   
-                    }
-                    xX= lastX;
-                    startHere = new Coordinates();
-                    startHere.setX(xX);
-                    startHere.setY(yY);
-                    availableLoc.add(startHere);
-                }
-            }
-        }
-        
-        
-        
-        //checks possible locations of ship horizontally
-        
-//        for (int k = 9; k >= 0; k--) { //pick an available shooting point
-//            for (int l = 0; l <= 9; l=l+lookForShip) {
-//                if (placesHit[l][k] == 0) {
-//                    startHere = new Coordinates();
-//                    startHere.setX(l);
-//                    startHere.setY(k);
-//                    if(startHere.x +lookForShip <= 9 && startHere.y >= 0){
-//                        availableLoc.add(startHere);
-//                    }
-//                }
-//            }
-//        }
-//    }
-    }
-
     private void removeFromShips(int shipJustWreckedLength) {
         for (int i = 0; i < ships.size(); i++) {
             if(ships.get(i)== shipJustWreckedLength){
+                System.out.println("Removed are from Array Ships are: " + ships.get(i) );
                 ships.remove(i);
                 return;
             }
@@ -821,6 +761,7 @@ private void printOutPossibleLocations() {
  
 public void calculateShipLocationVertical() {
         int lengthOfLargest = getLagrestShip();
+        System.out.println("Now Looking for " + lengthOfLargest);
 
         for (int i = 0; i < posShipsLoc.length; i++) {
             for (int j = 0; j < posShipsLoc[i].length; j++) {
@@ -875,24 +816,69 @@ public void calculateShipLocationVertical() {
     }
 
     private Coordinates getMostLikely() {
-        int lar = -1;
-        int xLar =-1;
-        int yLar =-1;
+        int largest = -1;
+        ArrayList<Position> mostLikelyPositions = new ArrayList<>();
         for (int i = 0; i < posShipsLoc.length; i++) {
             for (int j = 0; j < posShipsLoc[i].length; j++) {
-            if(posShipsLoc[i][j] > lar){
-                lar= posShipsLoc[i][j];
-                xLar = i;
-                yLar = j;
+            if(posShipsLoc[i][j] > largest){ // clears the list, and adds the new number to the list
+                largest = posShipsLoc[i][j];
+                mostLikelyPositions.clear();
+                mostLikelyPositions.add(new Position(i, j));
+            }
+            else if(posShipsLoc[i][j] == largest){ //adds to the list.
+                mostLikelyPositions.add(new Position(i, j));
+            }      
+            
+            
             }
             
-            
-            
-            }
-            
-            }
-        Coordinates mostLikely = new Coordinates(xLar, yLar, 1);
+            }// Now we will return a random from the list
+        System.out.println("Chosing a random from the most likely. Chosing between: " + mostLikelyPositions.size() + " Positions, With "  + largest);
+        for (Position pos : mostLikelyPositions) {
+            System.out.println(pos.x + "," + pos.y);
+        }
+        Position randomFromLikelys = mostLikelyPositions.get(rnd.nextInt(mostLikelyPositions.size()));
+        Coordinates mostLikely = new Coordinates(randomFromLikelys.x, randomFromLikelys.y, 1);
         return mostLikely;
+    }
+
+    private void findOtherNabours() {
+        /* What we know:
+        We have just wrecked and hit.
+        Priovities are not empty, and will have all the nabours from the ship just wrecked,
+        And the ones, from the ship we hit but did not wreck.
+        The placeshit will have -1 on places we hit and wrecked and 1 ons on where we just hit.
+        */
+        
+        ArrayList<Position> naboursToHits = new ArrayList<>();
+        priorities.clear();
+        System.out.println("Priovities cleared but added to, later");
+        for (int i = 0; i < placesHit.length; i++) {
+            for (int j = 0; j < placesHit[i].length; j++) {
+                if(placesHit[i][j] == 1){ // we need to add to priovities
+                 ArrayList<Position> temp = shot.getNabours(new Coordinates(i, j, 1));
+                 
+                    for (Position pos : temp) {
+                        if(board[pos.x][pos.y].getPre() !=0){
+                        naboursToHits.add(pos);
+                        }
+                    }
+                    
+                }
+            }
+            }
+        for (Position pos : naboursToHits) {
+            priorities.add(new Coordinates(pos.x, pos.y, 1));
+            System.out.println("Added To Priovities " + pos.x + "," + pos.y);
+        }
+        
+    }
+
+    private void addToShips(Fleet enemyShips) {
+        for (Ship ship : enemyShips) {
+            ships.add(ship.size());
+            System.out.println("Added to Ships is: " + ship.size());
+        }
     }
     
 }

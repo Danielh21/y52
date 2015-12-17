@@ -25,7 +25,6 @@ public class Test {
         Fleet fleet = FleetIni();
         rP.startMatch(1);
         rP.startRound(1);
-        rP.shipPossibleLoc();
         rP.printAvailableLocation();
 //        for (int i = 0; i < 100; i++) {
 //            Position n = rP.getFireCoordinates(fleet);
